@@ -17,10 +17,11 @@ def convert_seconds_to_hhmmss(seconds):
 
 id = input("Id\nLeave blank for auto connect {5554}\n")
 device = Emulator(id, -1) #port, number of devices
-exit()
+
 #slide coordiantes
 x1,y1,x2,y2 = 1000 ,1170,1040,250
-
+t1 = 1 #global timing do not touch
+t2 = 0.3
 
 #refresh coordinates
 x1_refresh,y1_refresh,x2_refresh,y2_refresh = 130,975,520,1010
@@ -47,22 +48,24 @@ shop5_buy_x1, shop5_buy_y1, shop5_buy_x2, shop5_buy_y2 = 1605, 760, 1850, 815
 shop6_buy_x1, shop6_buy_y1, shop6_buy_x2, shop6_buy_y2 = 1605, 980, 1850, 1025
 
 #start of script
-gems = input("gems:")
-amount_gems = gems #amount of gems to roll
+try:
+    gems = int(input("gems:"))
+    if(gems == 0):
+        raise ValueError("Encountered 0 value")
+
+    amount_gems = gems #amount of gems to roll
+    rolls = int(amount_gems/3)
+except:
+    raise TypeError("Int")
+
 covenant_summons = 0
 mystic_summons = 0
-rolls = int(amount_gems/3)
 for roll in range(rolls):
     #shop images, first 4
     start = t.time()
     im = device.screenshot()
     res_scalar_x = 1#device.abs_res_scalar_x
     res_scalar_y = 1#device.abs_res_scalar_y
-
-    #shop1_im = im.crop((shop1_x1, shop1_y1, shop1_x2, shop1_y2))
-    #shop2_im = im.crop((shop2_x1, shop2_y1, shop2_x2, shop2_y2))
-    #shop3_im = im.crop((shop3_x1, shop3_y1, shop3_x2, shop3_y2))
-    #shop4_im = im.crop((shop4_x1, shop4_y1, shop4_x2, shop4_y2))
 
     shop1_im = ImageOcr(im).crop_image(shop1_x1, shop1_y1, shop1_x2, shop1_y2,res_scalar_x,res_scalar_y)
     shop2_im = ImageOcr(im).crop_image(shop2_x1, shop2_y1, shop2_x2, shop2_y2,res_scalar_x,res_scalar_y)
@@ -100,10 +103,10 @@ for roll in range(rolls):
         if(buy == True):
             x_buy, y_buy = get_random_tap(shop1_buy_x1, (shop1_buy_y1+220*n), shop1_buy_x2, (shop1_buy_y2+220*n))
             device.screenInput(x_buy,y_buy)
-            t.sleep(0.9)
+            t.sleep(t1)
             x_buy_confirm, y_buy_confirm = get_random_tap(shop_buy_confirm_x1,shop_buy_confirm_y1,shop_buy_confirm_x2,shop_buy_confirm_y2)
             device.screenInput(x_buy_confirm,y_buy_confirm)
-            t.sleep(0.5)
+            t.sleep(t2)
         else:
             print(f'Shop: {n+1} Price: {item}')
 
@@ -112,7 +115,7 @@ for roll in range(rolls):
     #swipe
     x1_swipe,y_swipe1,x2_swipe,y2_swipe=get_random_swipe(x1,x2,y1,y2)
     device.screenSwipe(x1_swipe,y_swipe1,x2_swipe,y2_swipe)
-    t.sleep(2)
+    t.sleep(0.9)
     im2 = device.screenshot()
 
     shop5_im = ImageOcr(im2).crop_image(shop5_x1, shop5_y1, shop5_x2, shop5_y2,res_scalar_x,res_scalar_y)
@@ -146,22 +149,14 @@ for roll in range(rolls):
         if(buy == True):
             x_buy, y_buy = get_random_tap(shop5_buy_x1, (shop5_buy_y1+220*n), shop5_buy_x2, (shop5_buy_y2+220*n))
             device.screenInput(x_buy,y_buy)
-            t.sleep(0.9)
+            t.sleep(t1)
             x_buy_confirm, y_buy_confirm = get_random_tap(shop_buy_confirm_x1,shop_buy_confirm_y1,shop_buy_confirm_x2,shop_buy_confirm_y2)
             device.screenInput(x_buy_confirm,y_buy_confirm)
-            t.sleep(0.5)
+            t.sleep(t2)
         else:
             print(f'Shop: {n+5} Price: {item}')
 
         t.sleep(0.6)
-    
-    #shop1_im.save('shop1.png')
-    #shop2_im.save('shop2.png')
-    #shop3_im.save('shop3.png')
-    #shop4_im.save('shop4.png')
-    #shop5_im.save('shop5.png')
-    #shop6_im.save('shop6.png')
-    #exit() #for testing purposes
     
     #refresh shop
     #updated for reliability
@@ -177,4 +172,4 @@ for roll in range(rolls):
     print(f'Mystic medals: {mystic_summons}')
     print(f'Time left: {convert_seconds_to_hhmmss((end-start)*(rolls-roll+1))}')
     print(f'Cycle: {end-start}')
-    t.sleep(4)
+    t.sleep(2)
